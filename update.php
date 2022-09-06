@@ -15,9 +15,15 @@ $errorMessage = "<span class=text-red-500>*Ce champs est obligatoire</span>";
 
 // 1-je verifie si le formulaire est soumis
 if (!empty($_POST["submited"])) {
-    update($error);
+    require_once("utils/secure-form/include.php");
+    if (count($error) == 0) {
+        update($name, $price, $note, $description, $genre_clear, $plateforms_clear, $PEGI, $url_img);
+        // debug_array($error);
+    }
 
 }
+$game = getGame();
+$title = $game['name'];
 require("view/updatePage.php");
 ?>
 

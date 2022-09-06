@@ -52,7 +52,6 @@ function getAllGames(): array
 function getID(): int
 {
     if (!empty($_GET['id']) && is_numeric($_GET['id'])) {
-        // 2- je nettoie mon id contre xss
         $id = clear_xss($_GET['id']);
     } else {
         $_SESSION["error"] = "URL invalide";
@@ -109,11 +108,9 @@ function delete(): void
  * This function create an item
  * @return void 
  */
-function create($error): void
+function create($name,$price,$note,$description,$genre_clear,$plateforms_clear,$PEGI,$url_img): void
 {
-    $pdo = getPDO() ;
-    require_once("utils/secure-form/include.php");
-    if (count($error) == 0) {
+    $pdo = getPDO();
     $sql = "INSERT INTO jeux(name, price, genre, note, plateforms, description, PEGI, created_at, url_img) VALUES(:name, :price, :genre, :note, :plateforms, :description, :PEGI, NOW(), :url_img)";
     $query = $pdo->prepare($sql);
     $query->bindValue(':name', $name, PDO::PARAM_STR);
@@ -130,33 +127,31 @@ function create($error): void
     $_SESSION["success"] = "Le jeux a bien été ajouté";
     header("Location: index.php");
     die;
-    }
-}
-function update($error)
-{
-    $sql = "UPDATE jeux SET name = :name, price = :price, genre = :genre, note = :note,
-     plateforms = :plateforms, description = :description, url_img = :url_img, PEGI = :PEGI, updated_at = NOW() WHERE id= :id";
-
     
-    require_once("utils/secure-form/include.php");
-    if (count($error) == 0){
-    $pdo = getPDO();
-    $id = getID();
-        $query = $pdo->prepare($sql);
-        $query->bindValue(':id', $id, PDO::PARAM_INT);
-        $query->bindValue(':name', $name, PDO::PARAM_STR);
-        $query->bindValue(':price', $price, PDO::PARAM_STMT);
-        $query->bindValue(':note', $note, PDO::PARAM_STMT);
-        $query->bindValue(':description', $description, PDO::PARAM_STR);
-        $query->bindValue(':genre', implode("|", $genre_clear), PDO::PARAM_STR);
-        $query->bindValue(':plateforms', implode("|", $plateforms_clear), PDO::PARAM_STR);
-        $query->bindValue(':PEGI', $PEGI, PDO::PARAM_STR);
-
-        $query->execute();
-
-    if (!$game) {
-        $_SESSION["error"] = "Ce jeu n'est pas disponible.";
-        header("Location: index.php");
-    }
 }
+
+function update($name, $price, $note, $description, $genre_clear, $plateforms_clear, $PEGI, $url_img)
+{
+	$pdo = getPDO();
+	$id = getID();
+	$sql = "UPDATE jeux SET name = :name, price = :price, genre = :genre, note = :note,
+	plateforms = :plateforms, description = :description, url_img = :url_img, PEGI = :PEGI, updated_at = NOW() WHERE id= :id";
+	$query = $pdo->prepare($sql);
+	$query->bindValue(':id', $id, PDO::PARAM_INT);
+	$query->bindValue(':name', $name, PDO::PARAM_STR);
+	$query->bindValue(':price', $price, PDO::PARAM_STMT);
+	$query->bindValue(':note', $note, PDO::PARAM_STMT);
+	$query->bindValue(':description', $description, PDO::PARAM_STR);
+	$query->bindValue(':genre', implode("|", $genre_clear), PDO::PARAM_STR);
+	$query->bindValue(':plateforms', implode("|", $plateforms_clear), PDO::PARAM_STR);
+	$query->bindValue(':PEGI', $PEGI, PDO::PARAM_STR);
+	$query->bindValue(':url_img', $url_img, PDO::PARAM_STR);
+
+	$query->execute();
+
+	
+			$_SESSION["success"] = "le jeux a bien ete modifié.";
+		  header("Location: index.php");
+	
+
 }
